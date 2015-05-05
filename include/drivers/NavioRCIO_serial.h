@@ -3,6 +3,8 @@
 
 #include "modules/px4iofirmware/protocol.h"
 
+#define OK 1
+
 class NavioRCIO_serial
 {
     public:
@@ -13,6 +15,8 @@ class NavioRCIO_serial
         virtual int write(unsigned address, void *data, unsigned count = 1);
         virtual int ioctl(unsigned operation, unsigned &arg);
     private:
+        int _wait_complete();
+        
         IOPacket    _buffer;
         int         _fd;
 };

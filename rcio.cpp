@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
 {
     NavioRCIO io{};
 
-    printf("Hi, there\n");
+    io.detect();
+
     return 0;
 }
