@@ -19,6 +19,7 @@ class NavioRCIO_serial
         
         IOPacket    _buffer;
         int         _fd;
+        long        _baudrate;
 };
 
 #endif

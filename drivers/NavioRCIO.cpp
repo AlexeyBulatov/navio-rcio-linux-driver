@@ -12,16 +12,22 @@ NavioRCIO::NavioRCIO():
     _max_transfer(16)
 {
     _interface = new NavioRCIO_serial();
+
+    if (_interface == nullptr) {
+        fprintf(stderr, "_interface == nullptr\n");
+    }
 }
 
 NavioRCIO::~NavioRCIO()
 {
-    delete _interface;
+    if (_interface != nullptr) {
+        delete _interface;
+    }
 }
 
 void NavioRCIO::poll()
 {
-    char buffer[] = {0xf0, 0x0f};
+    char buffer[] = {0x6, 0x5};
 
     _interface->write(0x5a, buffer, sizeof(buffer));
 }
