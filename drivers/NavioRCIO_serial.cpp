@@ -66,7 +66,11 @@ int NavioRCIO_serial::read(unsigned address, void *data, unsigned count)
 
 int NavioRCIO_serial::write(unsigned address, void *data, unsigned count)
 {
-    return 0;
+    int ret;
+
+    ret = write(_fd, data, count);
+
+    return ret;
 }
 
 int NavioRCIO_serial::ioctl(unsigned operation, unsigned &arg)

@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <cstdio>
+#include <unistd.h>
 
 #include <drivers/NavioRCIO.h>
 
@@ -18,6 +19,13 @@ NavioRCIO::~NavioRCIO()
     delete _interface;
 }
 
+void NavioRCIO::poll()
+{
+    char buffer[] = {0xf0, 0x0f};
+
+    _interface->write(0x5a, buffer, sizeof(buffer));
+}
+
 int NavioRCIO::detect()
 {
      unsigned protocol = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_PROTOCOL_VERSION);
@@ -30,6 +38,7 @@ int NavioRCIO::detect()
          }
          return -1;
      }
+     return 1;
 }
 
 

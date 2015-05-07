@@ -10,6 +10,7 @@ class NavioRCIO
         ~NavioRCIO();
 
        int detect(); 
+       void poll();
 
     private:
 

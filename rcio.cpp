@@ -7,7 +7,11 @@ int main(int argc, char *argv[])
 {
     NavioRCIO io{};
 
-    io.detect();
+    // io.detect();
+
+    while (true) {
+        io.poll();
+    }
 
     return 0;
 }
