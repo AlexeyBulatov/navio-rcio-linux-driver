@@ -131,7 +131,7 @@ int NavioRCIO_serial::read(unsigned address, void *data, unsigned count)
     return result;
 }
 
-int NavioRCIO_serial::write(unsigned address, void *data, unsigned count)
+int NavioRCIO_serial::write(unsigned address, const void *data, unsigned count)
 {
     int ret;
 
@@ -139,8 +139,7 @@ int NavioRCIO_serial::write(unsigned address, void *data, unsigned count)
         fprintf(stderr, "data null\n");
     }
 
-    ret = write(_fd, data, count);
-    fprintf(stderr, "data written\n");
+    ret = ::write(_fd, data, count);
 
     return ret;
 }
