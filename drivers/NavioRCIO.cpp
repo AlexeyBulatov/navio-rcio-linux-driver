@@ -333,3 +333,24 @@ void NavioRCIO::print_status(bool extended_status)
 
 	printf("\n");
 }
+
+
+int NavioRCIO::ioctl(int cmd, unsigned long arg)
+{
+    int ret = OK;
+
+	/* regular ioctl? */
+	switch (cmd) {
+
+    	case PX4IO_SET_DEBUG:
+		/* set the debug level */
+		ret = io_reg_set(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG, arg);
+		break;
+        
+        default:
+        ret = -EINVAL;
+    }
+        
+    return ret;
+}
+

@@ -3,6 +3,8 @@
 
 #include "NavioRCIO_serial.h"
 
+#define PX4IO_SET_DEBUG 1
+
 class NavioRCIO
 {
     public:
@@ -11,6 +13,7 @@ class NavioRCIO
 
        bool detect(); 
        void poll();
+       int ioctl(int cmd, unsigned long arg);
        void print_status(bool extended_status);
 
     private:
