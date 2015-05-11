@@ -11,6 +11,7 @@ class NavioRCIO
 
        bool detect(); 
        void poll();
+       void print_status(bool extended_status);
 
     private:
 
@@ -20,9 +21,21 @@ class NavioRCIO
 
         int io_reg_get(uint8_t page, uint8_t offset, uint16_t *values, unsigned num_values);
         uint32_t io_reg_get(uint8_t page, uint8_t offset);
+        int io_reg_set(uint8_t page, uint8_t offset, const uint16_t *values, unsigned num_values);
+        int io_reg_set(uint8_t page, uint8_t offset, uint16_t value);
+        int io_reg_modify(uint8_t page, uint8_t offset, uint16_t clearbits, uint16_t setbits);
 
         NavioRCIO_serial *_interface;
-        unsigned _max_transfer;
+        unsigned		_hardware;		///< Hardware revision
+	    unsigned		_max_actuators;		///< Maximum # of actuators supported by PX4IO
+	    unsigned		_max_controls;		///< Maximum # of controls supported by PX4IO
+	    unsigned		_max_rc_input;		///< Maximum receiver channels supported by PX4IO
+	    unsigned		_max_relays;		///< Maximum relays supported by PX4IO
+	    unsigned		_max_transfer;		///< Maximum number of I2C transfers supported by PX4IO
+        float			_battery_amp_per_volt;	///< current sensor amps/volt
+	    float			_battery_amp_bias;	///< current sensor bias
+	    float			_battery_mamphour_total;///< amp hours consumed so far
+	    uint64_t		_battery_last_timestamp;///< last amp hour calculation timestamp
 
 };
 #endif

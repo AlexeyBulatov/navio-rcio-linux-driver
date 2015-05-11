@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 
     if (io.detect()) {
         fprintf(stderr, "Detected\n");
+        io.print_status(true);
     } else {
         fprintf(stderr, "Not detected\n");
     }

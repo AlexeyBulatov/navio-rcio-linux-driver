@@ -146,15 +146,45 @@ int NavioRCIO_serial::read(unsigned address, void *data, unsigned count)
 
 int NavioRCIO_serial::write(unsigned address, const void *data, unsigned count)
 {
-    int ret;
+	uint8_t page = address >> 8;
+	uint8_t offset = address & 0xff;
+	const uint16_t *values = reinterpret_cast<const uint16_t *>(data);
 
-    if (data == nullptr) {
-        fprintf(stderr, "data null\n");
-    }
+	if (count > PKT_MAX_REGS)
+		return -EINVAL;
 
-    ret = ::write(_fd, data, count);
+	int result;
+	for (unsigned retries = 0; retries < 3; retries++) {
 
-    return ret;
+		_buffer.count_code = count | PKT_CODE_WRITE;
+		_buffer.page = page;
+		_buffer.offset = offset;
+		memcpy((void *)&_buffer.regs[0], (void *)values, (2 * count));
+		for (unsigned i = count; i < PKT_MAX_REGS; i++)
+			_buffer.regs[i] = 0x55aa;
+
+		/* XXX implement check byte */
+
+		/* start the transaction and wait for it to complete */
+		result = _wait_complete();
+
+		/* successful transaction? */
+		if (result == OK) {
+
+			/* check result in packet */
+			if (PKT_CODE(_buffer) == PKT_CODE_ERROR) {
+
+				/* IO didn't like it - no point retrying */
+				result = -EINVAL;
+			}
+
+			break;
+		}
+	}
+
+	if (result == OK)
+		result = count;
+	return result;
 }
 
 int NavioRCIO_serial::ioctl(unsigned operation, unsigned &arg)
