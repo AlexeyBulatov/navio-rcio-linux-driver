@@ -95,40 +95,53 @@ int NavioRCIO_serial::init()
 
 int NavioRCIO_serial::read(unsigned address, void *data, unsigned count)
 {
-    uint8_t page = address >> 8;
-    uint8_t offset = address & 0xff;
-    const uint16_t *values = reinterpret_cast<const uint16_t *>(data);
+	uint8_t page = address >> 8;
+	uint8_t offset = address & 0xff;
+	uint16_t *values = reinterpret_cast<uint16_t *>(data);
 
-    if (count > PKT_MAX_REGS)
-        return -EINVAL;
+	if (count > PKT_MAX_REGS)
+		return -EINVAL;
 
-    int result;
 
-    for (unsigned retries = 0; retries < 3; retries++) {
-        _buffer.count_code = count | PKT_CODE_WRITE;
-        _buffer.page = page;
-        _buffer.offset = offset;
-        memcpy((void *)&_buffer.regs[0], (void *)values, (2 * count));
-        for (unsigned i = count; i < PKT_MAX_REGS; i++)
-            _buffer.regs[i] = 0x55aa;
-        /* XXX implement check byte */
-        /* start the transaction and wait for it to complete */
-        result = _wait_complete();
-        /* successful transaction? */
-        if (result == OK) {
-            /* check result in packet */
-            if (PKT_CODE(_buffer) == PKT_CODE_ERROR) {
-                /* IO didn't like it - no point retrying */
-                result = -EINVAL;
-            }
-            break;
-        }
-    }
+	int result;
+	for (unsigned retries = 0; retries < 3; retries++) {
 
-    if (result == OK)
-        result = count;
+		_buffer.count_code = count | PKT_CODE_READ;
+		_buffer.page = page;
+		_buffer.offset = offset;
 
-    return result;
+		/* start the transaction and wait for it to complete */
+		result = _wait_complete();
+
+		/* successful transaction? */
+		if (result == OK) {
+
+			/* check result in packet */
+			if (PKT_CODE(_buffer) == PKT_CODE_ERROR) {
+
+				/* IO didn't like it - no point retrying */
+				result = -EINVAL;
+
+			/* compare the received count with the expected count */
+			} else if (PKT_COUNT(_buffer) != count) {
+
+				/* IO returned the wrong number of registers - no point retrying */
+				result = -EIO;
+
+			/* successful read */				
+			} else {
+
+				/* copy back the result */
+				memcpy(values, &_buffer.regs[0], (2 * count));
+			}
+
+			break;
+		}
+	}
+
+	if (result == OK)
+		result = count;
+	return result;
 }
 
 int NavioRCIO_serial::write(unsigned address, const void *data, unsigned count)
