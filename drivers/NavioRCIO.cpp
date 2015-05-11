@@ -27,9 +27,21 @@ NavioRCIO::~NavioRCIO()
 
 void NavioRCIO::poll()
 {
-    char buffer[] = {0x6, 0x5};
+    static const size_t ALPHABET_SIZE = 50;
 
-    _interface->write(0x5a, buffer, sizeof(buffer));
+    static int i = 0;
+
+    char *buffer = new char[i];
+
+    for (int j = 0; j < i; j++) {
+        buffer[j] = 'a' + j;
+    }
+
+    _interface->write(0x5a, buffer, i);
+
+    i = (i + 1) % ALPHABET_SIZE;
+
+    delete [] buffer;
 }
 
 int NavioRCIO::detect()
