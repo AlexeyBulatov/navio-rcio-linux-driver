@@ -7,10 +7,10 @@ int main(int argc, char *argv[])
 {
     NavioRCIO io{};
 
-    // io.detect();
-
-    while (true) {
-        io.poll();
+    if (io.detect()) {
+        fprintf(stderr, "Detected\n");
+    } else {
+        fprintf(stderr, "Not detected\n");
     }
 
     return 0;

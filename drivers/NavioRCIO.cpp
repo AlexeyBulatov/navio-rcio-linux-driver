@@ -44,7 +44,7 @@ void NavioRCIO::poll()
     delete [] buffer;
 }
 
-int NavioRCIO::detect()
+bool NavioRCIO::detect()
 {
      unsigned protocol = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_PROTOCOL_VERSION);
 
@@ -54,9 +54,9 @@ int NavioRCIO::detect()
          } else {
              log("IO version error\n");
          }
-         return -1;
+         return false;
      }
-     return 1;
+     return true;
 }
 
 

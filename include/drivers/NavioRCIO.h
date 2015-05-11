@@ -9,7 +9,7 @@ class NavioRCIO
         NavioRCIO();
         ~NavioRCIO();
 
-       int detect(); 
+       bool detect(); 
        void poll();
 
     private:
