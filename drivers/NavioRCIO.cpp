@@ -49,6 +49,7 @@ bool NavioRCIO::detect()
      unsigned protocol = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_PROTOCOL_VERSION);
 
      if (protocol != PX4IO_PROTOCOL_VERSION) {
+         fprintf(stderr, "protocol: 0x%x\n", protocol);
          if (protocol == _io_reg_get_error) {
              log("IO not installed\n");
          } else {

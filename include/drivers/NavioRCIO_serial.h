@@ -16,6 +16,7 @@ class NavioRCIO_serial
         virtual int ioctl(unsigned operation, unsigned &arg);
     private:
         int _wait_complete();
+        int _serial_open(const char *device, int rate);
         
         IOPacket    _buffer;
         int         _fd;

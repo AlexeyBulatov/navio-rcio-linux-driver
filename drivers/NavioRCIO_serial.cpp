@@ -24,7 +24,7 @@ static int rate_to_constant(int baudrate) {
 }    
 
 /* Open serial port in raw mode, with custom baudrate if necessary */
-int _serial_open(const char *device, int rate)
+int NavioRCIO_serial::_serial_open(const char *device, int rate)
 {
 	struct termios options;
 	struct serial_struct serinfo;
@@ -32,7 +32,7 @@ int _serial_open(const char *device, int rate)
 	int speed = 0;
 
 	/* Open and configure serial port */
-	if ((fd = open(device,O_RDWR|O_NOCTTY)) == -1)
+	if ((fd = ::open(device,O_RDWR|O_NOCTTY)) == -1)
 		return -1;
 
 	speed = rate_to_constant(rate);
@@ -40,16 +40,16 @@ int _serial_open(const char *device, int rate)
 	if (speed == 0) {
 		/* Custom divisor */
 		serinfo.reserved_char[0] = 0;
-		if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0)
+		if (::ioctl(fd, TIOCGSERIAL, &serinfo) < 0)
 			return -1;
 		serinfo.flags &= ~ASYNC_SPD_MASK;
 		serinfo.flags |= ASYNC_SPD_CUST;
 		serinfo.custom_divisor = (serinfo.baud_base + (rate / 2)) / rate;
 		if (serinfo.custom_divisor < 1) 
 			serinfo.custom_divisor = 1;
-		if (ioctl(fd, TIOCSSERIAL, &serinfo) < 0)
+		if (::ioctl(fd, TIOCSSERIAL, &serinfo) < 0)
 			return -1;
-		if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0)
+		if (::ioctl(fd, TIOCGSERIAL, &serinfo) < 0)
 			return -1;
 		if (serinfo.custom_divisor * rate != serinfo.baud_base) {
 			warnx("actual baudrate is %d / %d = %f",
@@ -58,7 +58,7 @@ int _serial_open(const char *device, int rate)
 		}
 	}
 
-	fcntl(fd, F_SETFL, 0);
+	::fcntl(fd, F_SETFL, 0);
 	tcgetattr(fd, &options);
 	cfsetispeed(&options, speed ?: B38400);
 	cfsetospeed(&options, speed ?: B38400);
@@ -170,12 +170,19 @@ int NavioRCIO_serial::_wait_complete()
     _buffer.crc = 0;
     _buffer.crc = crc_packet(&_buffer);
 
-    
-    ret = write(_fd, (char *) &_buffer,  PKT_SIZE(_buffer));
+    ret = ::write(_fd, (char *) &_buffer,  PKT_SIZE(_buffer));
 
     if (ret < 0) {
-        fprintf(stderr, "write error\n");
+        warn("write");
+        return -EIO;
     }
+
+    ret = ::read(_fd, (char *) &_buffer, PKT_SIZE(_buffer));
+
+    if (ret < 0) {
+        warn("read");
+        return -EIO;
+    } 
 
     return OK;
 }
