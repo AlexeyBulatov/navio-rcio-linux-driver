@@ -17,7 +17,7 @@ class NavioRCIO_serial
     private:
         int _wait_complete();
         int _serial_open(const char *device, int rate);
-        
+
         IOPacket    _buffer;
         int         _fd;
         long        _baudrate;
