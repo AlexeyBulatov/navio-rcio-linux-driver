@@ -1,6 +1,7 @@
-#include <cstdio>
+#include <gtest/gtest.h>
 
-int main()
-{
-    return 0;
+#include <drivers/NavioRCIO.h>
+
+TEST(IndependentMethod, ResetsToZero) {
+	EXPECT_EQ(0,1);
 }
