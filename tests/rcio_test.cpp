@@ -55,6 +55,54 @@ TEST_F(NavioRCIO_Test, rc_input_source_unknown_get) {
     rc_input_values input_rc;
 
     ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
-    
+
     EXPECT_TRUE(ret == -ENOTCONN);
+}
+
+TEST_F(NavioRCIO_Test, rc_input_source_ppm_get) {
+
+    int ret;
+    rc_input_values input_rc;
+
+    ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
+
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_TRUE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_PPM);
+}
+
+TEST_F(NavioRCIO_Test, rc_input_source_sbus_get) {
+
+    int ret;
+    rc_input_values input_rc;
+
+    ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
+
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_TRUE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_SBUS);
+}
+
+TEST_F(NavioRCIO_Test, rc_input_source_spektrum_get) {
+
+    int ret;
+    rc_input_values input_rc;
+
+    ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
+
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_TRUE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_SPEKTRUM);
+}
+
+TEST_F(NavioRCIO_Test, rc_input_source_st24_get) {
+
+    int ret;
+    rc_input_values input_rc;
+
+    ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
+
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_TRUE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_ST24);
 }
