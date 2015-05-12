@@ -5,6 +5,7 @@
 
 #define PX4IO_SET_DEBUG 1
 #define PX4IO_GET_DEBUG 2
+#define PX4IO_GET_RAW_ADC1 3
 
 class NavioRCIO
 {

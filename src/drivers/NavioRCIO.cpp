@@ -370,6 +370,11 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             ret = OK;
 		break;
 
+    	case PX4IO_GET_RAW_ADC1:
+		    *(unsigned*)arg = io_reg_get(PX4IO_PAGE_RAW_ADC_INPUT, 0);
+            ret = OK;
+		break;
+
         default:
         ret = -EINVAL;
     }
