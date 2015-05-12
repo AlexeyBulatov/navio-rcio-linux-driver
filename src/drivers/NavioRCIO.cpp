@@ -376,6 +376,44 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             ret = OK;
 		break;
 
+
+        case RC_INPUT_GET: {
+			uint16_t status;
+			rc_input_values *rc_val = (rc_input_values *)arg;
+
+			ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS, &status, 1);
+
+			if (ret != OK)
+				break;
+
+			/* if no R/C input, don't try to fetch anything */
+			if (!(status & PX4IO_P_STATUS_FLAGS_RC_OK)) {
+				ret = -ENOTCONN;
+				break;
+			}
+
+			/* sort out the source of the values */
+			if (status & PX4IO_P_STATUS_FLAGS_RC_PPM) {
+				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_PPM;
+
+			} else if (status & PX4IO_P_STATUS_FLAGS_RC_DSM) {
+				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SPEKTRUM;
+
+			} else if (status & PX4IO_P_STATUS_FLAGS_RC_SBUS) {
+				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SBUS;
+
+			} else if (status & PX4IO_P_STATUS_FLAGS_RC_ST24) {
+				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_ST24;
+
+			} else {
+				rc_val->input_source = RC_INPUT_SOURCE_UNKNOWN;
+			}
+
+			/* read raw R/C input values */
+			ret = io_reg_get(PX4IO_PAGE_RAW_RC_INPUT, PX4IO_P_RAW_RC_BASE, &(rc_val->values[0]), _max_rc_input);
+			break;
+		}
+
         default:
         ret = -EINVAL;
     }

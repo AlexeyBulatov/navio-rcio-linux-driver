@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <drivers/NavioRCIO.h>
+#include <drivers/NavioRCInput.h>
 
 class NavioRCIO_Test : public ::testing::Test {
 protected:
@@ -47,4 +48,13 @@ TEST_F(NavioRCIO_Test, adc1_get) {
     EXPECT_FALSE(ret < 0);
 
     EXPECT_TRUE(raw_adc1_sample > 4090);
+}
+
+TEST_F(NavioRCIO_Test, rc_input_source_unknown_get) {
+    int ret;
+    rc_input_values input_rc;
+
+    ret = rcio.ioctl(RC_INPUT_GET, (unsigned long) &input_rc);
+    
+    EXPECT_TRUE(ret == -ENOTCONN);
 }
