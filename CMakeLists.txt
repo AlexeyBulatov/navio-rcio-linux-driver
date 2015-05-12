@@ -12,12 +12,13 @@ add_executable(rcio rcio.cpp)
 target_link_libraries(rcio libdrivers)
 
 if (test)
+  enable_testing()
+
   # This adds another subdirectory, which has 'project(gtest)'.
   include_directories(lib/googletest/include)
   add_subdirectory(lib/googletest)
   add_subdirectory(tests)
 
-  enable_testing()
 
   # Include the gtest library. gtest_SOURCE_DIR is available due to
   # 'project(gtest)' above.

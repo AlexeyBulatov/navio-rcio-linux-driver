@@ -1,9 +1,8 @@
 project(tests)
 
-set(test1_source test1.cpp)
+set(rcio_src rcio_test.cpp)
 
-add_executable(test1 ${test1_source})
-target_link_libraries(test1 libdrivers)
-target_link_libraries(test1 gtest_main gtest)
+add_executable(rcio_test ${rcio_src})
+target_link_libraries(rcio_test libdrivers gtest_main gtest)
 
-add_test(NAME Test1 COMMAND test1)
+add_test(NAME RCIO_Test COMMAND rcio_test)

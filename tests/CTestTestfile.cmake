@@ -4,4 +4,4 @@
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
-ADD_TEST(Test1 "/home/george/Documents/code/emlid/navio/stm32/navio-rcio-linux-driver/tests/test1")
+ADD_TEST(RCIO_Test "/home/george/Documents/code/emlid/navio/stm32/navio-rcio-linux-driver/tests/rcio_test")
