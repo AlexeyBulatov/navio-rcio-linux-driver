@@ -4,6 +4,7 @@
 #include <err.h>
 
 #include <drivers/NavioRCIO.h>
+#include <drivers/NavioRCInput.h>
 
 #define debug(fmt, args ...) fprintf(stderr, "[RCIO]: " fmt "\n", ##args)
 #define log(fmt, args ...) debug(fmt, ##args)
