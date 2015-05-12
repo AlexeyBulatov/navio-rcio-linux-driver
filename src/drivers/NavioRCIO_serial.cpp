@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 
 #include <termio.h>
 #include <err.h>
@@ -85,6 +86,7 @@ int NavioRCIO_serial::_serial_open(const char *device, int rate)
     if (tcsetattr(fd, TCSANOW, &options) != 0) {
         return -1;
     }
+
 
     return fd;
 }
@@ -231,13 +233,31 @@ int NavioRCIO_serial::_wait_complete()
         return -EIO;
     }
 
-    ret = ::read(_fd, (char *) &_buffer, PKT_SIZE(_buffer));
+    struct pollfd fds;    
+
+    fds.fd = _fd;
+    fds.events = POLLIN;
+
+    ret = ::poll(&fds, 1, 1000);
 
     if (ret < 0) {
-        warn("read");
+        warn("poll");
         return -EIO;
-    } 
+    }
+    
+    if (ret == 0) {
+        log("trying to read too fast");
+        return -ETIMEDOUT;
+    } else {
 
-    return OK;
+        ret = ::read(_fd, (char *) &_buffer, PKT_SIZE(_buffer));
+
+        if (ret < 0) {
+            warn("read");
+            return -EIO;
+        } 
+
+        return OK;
+    }
 }
 
