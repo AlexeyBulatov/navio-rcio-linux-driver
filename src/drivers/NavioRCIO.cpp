@@ -365,6 +365,11 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
         ret = io_reg_set(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG, arg);
         break;
 
+    	case PX4IO_GET_DEBUG:
+		    *(unsigned long*)arg = io_reg_get(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG);
+            ret = OK;
+		break;
+
         default:
         ret = -EINVAL;
     }

@@ -4,6 +4,7 @@
 #include "NavioRCIO_serial.h"
 
 #define PX4IO_SET_DEBUG 1
+#define PX4IO_GET_DEBUG 2
 
 class NavioRCIO
 {
