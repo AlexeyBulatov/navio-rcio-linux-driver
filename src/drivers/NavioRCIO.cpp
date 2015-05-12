@@ -19,13 +19,17 @@ NavioRCIO::NavioRCIO():
     _battery_amp_per_volt(90.0f / 5.0f), // this matches the 3DR current sensor
     _battery_amp_bias(0),
     _battery_mamphour_total(0),
-    _battery_last_timestamp(0)
-
+    _battery_last_timestamp(0),
+    _initialized(false)
 {
 }
 
 bool NavioRCIO::init()
 {
+    if (_initialized) {
+        return true;
+    }
+
     _interface = new NavioRCIO_serial();
 
     if (_interface == nullptr) {
@@ -37,6 +41,8 @@ bool NavioRCIO::init()
         warn("bus interface not initialized");
         return false;
     }
+
+    _initialized = true;
 
     return true;
 }

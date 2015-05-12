@@ -38,5 +38,6 @@ class NavioRCIO
         float           _battery_mamphour_total;///< amp hours consumed so far
         uint64_t        _battery_last_timestamp;///< last amp hour calculation timestamp
 
+        bool            _initialized;
 };
 #endif
