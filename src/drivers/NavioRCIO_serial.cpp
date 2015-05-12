@@ -10,6 +10,8 @@
 #include <err.h>
 #include <linux/serial.h>
 
+#define log(fmt, args ...) fprintf(stderr, "[RCIO_serial]: " fmt "\n", ##args)
+
 static int rate_to_constant(int baudrate) {
 #define B(x) case x: return B##x
 	switch(baudrate) {
@@ -72,25 +74,31 @@ int NavioRCIO_serial::_serial_open(const char *device, int rate)
 }
 
 NavioRCIO_serial::NavioRCIO_serial():
+    _fd(-1),
     _baudrate(1500000)
 {
 
+}
+
+bool NavioRCIO_serial::init()
+{
     _fd = _serial_open("/dev/ttyUSB0", _baudrate);
 
     if (_fd < 0) {
-        fprintf(stderr, "ERROR\n");
+        warn("_serial_open");
+        return false;
     }
 
+    return true;
 }
 
 NavioRCIO_serial::~NavioRCIO_serial()
 {
-
-}
-
-int NavioRCIO_serial::init()
-{
-    return 0;
+    if (_fd > 0) {
+        if (::close(_fd) < 0) {
+            warn("close");
+        }
+    }
 }
 
 int NavioRCIO_serial::read(unsigned address, void *data, unsigned count)

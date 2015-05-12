@@ -16,6 +16,11 @@ int main(int argc, char *argv[])
 
     NavioRCIO io{};
 
+    if (!io.init()) {
+        fprintf(stderr, "Init failed\n");
+        return 1;
+    }
+
     if (io.detect()) {
         fprintf(stderr, "Detected\n");
 

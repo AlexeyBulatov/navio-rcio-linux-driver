@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <cstdio>
 #include <unistd.h>
+#include <err.h>
 
 #include <drivers/NavioRCIO.h>
 
@@ -21,11 +22,23 @@ NavioRCIO::NavioRCIO():
 	_battery_last_timestamp(0)
 
 {
+}
+
+bool NavioRCIO::init()
+{
     _interface = new NavioRCIO_serial();
 
     if (_interface == nullptr) {
-        fprintf(stderr, "_interface == nullptr\n");
+        warn("_interface not allocated");
+        return false;
     }
+
+    if (!_interface->init()) {
+        warn("bus interface not initialized");
+        return false;
+    }
+
+    return true;
 }
 
 NavioRCIO::~NavioRCIO()

@@ -10,7 +10,7 @@ class NavioRCIO_serial
     public:
         NavioRCIO_serial();
         virtual ~NavioRCIO_serial();
-        virtual int init();
+        virtual bool init();
         virtual int read(unsigned offset, void *data, unsigned count = 1);
         virtual int write(unsigned address, const void *data, unsigned count = 1);
         virtual int ioctl(unsigned operation, unsigned &arg);

@@ -11,6 +11,7 @@ class NavioRCIO
         NavioRCIO();
         ~NavioRCIO();
 
+        bool init();
        bool detect(); 
        void poll();
        int ioctl(int cmd, unsigned long arg);
