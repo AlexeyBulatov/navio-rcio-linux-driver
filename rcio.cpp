@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <unistd.h>
+
 #include <modules/px4iofirmware/protocol.h>
 #include <drivers/NavioRCIO.h>
 
@@ -28,7 +30,10 @@ int main(int argc, char *argv[])
         if (argc > 1) 
             io.ioctl(PX4IO_SET_DEBUG, atoi(argv[1]));
 
-        io.print_status(true);
+        while(true) {
+            io.print_status(true);
+            sleep(1);
+        }
     } else {
         fprintf(stderr, "Not detected\n");
     }
