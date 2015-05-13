@@ -73,6 +73,18 @@ bool NavioRCIO::init()
 
     _initialized = true;
 
+#if 0
+    log("_hardware: %d", _hardware);
+    log("_max_actuators: %d", _max_actuators);
+    log("_max_controls: %d", _max_controls);
+    log("_max_relays: %d", _max_relays);
+    log("_max_transfer: %d", _max_transfer);
+    log("_max_rc_input: %d", _max_rc_input);
+    
+    while(true)
+        ;
+#endif
+
     return true;
 }
 

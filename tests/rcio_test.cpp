@@ -113,3 +113,45 @@ TEST_F(NavioRCIO_Test, rc_input_source_st24_get) {
 
     EXPECT_FALSE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_ST24);
 }
+
+
+TEST_F(NavioRCIO_Test, rc_pwm_set_arm) {
+    int ret;
+
+    ret = -1;
+
+    EXPECT_TRUE(ret >= 0);
+}
+
+TEST_F(NavioRCIO_Test, rc_pwm_set_disarm) {
+    int ret;
+
+    ret = -1;
+
+    EXPECT_TRUE(ret >= 0);
+}
+
+TEST_F(NavioRCIO_Test, rc_pwm_set_arm_ok) {
+    int ret;
+
+    ret = -1;
+
+    EXPECT_TRUE(ret >= 0);
+}
+
+TEST_F(NavioRCIO_Test, rc_pwm_clear_arm_ok) {
+    int ret;
+
+    ret = -1;
+
+    EXPECT_TRUE(ret >= 0);
+}
+
+TEST_F(NavioRCIO_Test, rc_output_pwm1) {
+
+    int ret;
+
+    ret = -1;
+
+    EXPECT_TRUE(ret >= 0);
+}
