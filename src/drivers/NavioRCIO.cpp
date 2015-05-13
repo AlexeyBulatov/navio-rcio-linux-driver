@@ -5,6 +5,7 @@
 
 #include <drivers/NavioRCIO.h>
 #include <drivers/NavioRCInput.h>
+#include <drivers/NavioRCOutput.h>
 #include <drivers/common.h>
 
 #define debug(fmt, args ...) fprintf(stderr, "[RCIO]: " fmt "\n", ##args)
@@ -80,10 +81,17 @@ bool NavioRCIO::init()
     log("_max_relays: %d", _max_relays);
     log("_max_transfer: %d", _max_transfer);
     log("_max_rc_input: %d", _max_rc_input);
-    
+
     while(true)
         ;
 #endif
+
+        /* dis-arm IO before touching anything */
+        io_reg_modify(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_ARMING,
+                  PX4IO_P_SETUP_ARMING_FMU_ARMED |
+                  PX4IO_P_SETUP_ARMING_INAIR_RESTART_OK |
+                  PX4IO_P_SETUP_ARMING_MANUAL_OVERRIDE_OK |
+                  PX4IO_P_SETUP_ARMING_ALWAYS_PWM_ENABLE, 0);
 
     return true;
 }
@@ -454,7 +462,42 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             break;
         }
 
-        default:
+
+
+        case PWM_SERVO_SET_RC_CONFIG: {
+            /* enable setting of RC configuration without relying
+               on param_get()
+            */
+            struct pwm_output_rc_config* config = (struct pwm_output_rc_config*)arg;
+            if (config->channel >= RC_INPUT_MAX_CHANNELS) {
+                /* fail with error */
+                return -E2BIG;
+            }
+
+            /* copy values to registers in IO */
+            uint16_t regs[PX4IO_P_RC_CONFIG_STRIDE];
+            uint16_t offset = config->channel * PX4IO_P_RC_CONFIG_STRIDE;
+            regs[PX4IO_P_RC_CONFIG_MIN]        = config->rc_min;
+            regs[PX4IO_P_RC_CONFIG_CENTER]     = config->rc_trim;
+            regs[PX4IO_P_RC_CONFIG_MAX]        = config->rc_max;
+            regs[PX4IO_P_RC_CONFIG_DEADZONE]   = config->rc_dz;
+            regs[PX4IO_P_RC_CONFIG_ASSIGNMENT] = config->rc_assignment;
+            regs[PX4IO_P_RC_CONFIG_OPTIONS]    = PX4IO_P_RC_CONFIG_OPTIONS_ENABLED;
+            if (config->rc_reverse) {
+                regs[PX4IO_P_RC_CONFIG_OPTIONS] |= PX4IO_P_RC_CONFIG_OPTIONS_REVERSE;
+            }
+            ret = io_reg_set(PX4IO_PAGE_RC_CONFIG, offset, regs, PX4IO_P_RC_CONFIG_STRIDE);
+            break;
+        }
+
+        case IO_GET_INIT_STATUS: {
+
+            ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS);
+
+            *(bool *) arg = ret & PX4IO_P_STATUS_FLAGS_INIT_OK;
+
+        }
+            default:
         ret = -EINVAL;
     }
 

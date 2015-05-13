@@ -3,6 +3,7 @@
 #include <drivers/NavioRCIO.h>
 #include <drivers/common.h>
 #include <drivers/NavioRCInput.h>
+#include <drivers/NavioRCOutput.h>
 
 class NavioRCIO_Test : public ::testing::Test {
 protected:
@@ -154,4 +155,29 @@ TEST_F(NavioRCIO_Test, rc_output_pwm1) {
     ret = -1;
 
     EXPECT_TRUE(ret >= 0);
+}
+
+TEST_F(NavioRCIO_Test, rc_set_wrong_config) {
+
+    int ret;
+
+    struct pwm_output_rc_config config;
+
+	config.channel       =  0x1;
+	config.rc_min        =  950;
+	config.rc_trim       =  1500;
+	config.rc_max        =  850;
+	config.rc_dz         =  100;
+	config.rc_assignment =  0x1;
+	config.rc_reverse    =  0x0;
+
+    ret = rcio->ioctl(PWM_SERVO_SET_RC_CONFIG, (unsigned long) &config);
+
+    EXPECT_TRUE(ret >= 0);
+
+    bool initialized;
+
+    ret = rcio->ioctl(IO_GET_INIT_STATUS, (unsigned long) &initialized);
+
+    EXPECT_TRUE(initialized == false);
 }
