@@ -10,7 +10,7 @@
 class NavioRCIO
 {
     public:
-        NavioRCIO();
+        NavioRCIO(NavioRCIO_serial *interface);
         ~NavioRCIO();
 
         bool init();

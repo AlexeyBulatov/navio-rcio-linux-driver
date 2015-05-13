@@ -16,7 +16,14 @@ int main(int argc, char *argv[])
 {
     progname = argv[0];
 
-    NavioRCIO io{};
+    NavioRCIO_serial interface{};
+
+    if (!interface.init()) {
+        fprintf(stderr, "bus interface not initialized");
+        return 1;
+    }
+
+    NavioRCIO io{&interface};
 
     if (!io.init()) {
         fprintf(stderr, "Init failed\n");

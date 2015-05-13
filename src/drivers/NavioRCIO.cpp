@@ -9,8 +9,8 @@
 #define debug(fmt, args ...) fprintf(stderr, "[RCIO]: " fmt "\n", ##args)
 #define log(fmt, args ...) debug(fmt, ##args)
 
-NavioRCIO::NavioRCIO():
-    _interface(nullptr),
+NavioRCIO::NavioRCIO(NavioRCIO_serial *interface):
+    _interface(interface),
     _hardware(0),
     _max_actuators(0),
     _max_controls(0),
@@ -29,18 +29,6 @@ bool NavioRCIO::init()
 {
     if (_initialized) {
         return true;
-    }
-
-    _interface = new NavioRCIO_serial();
-
-    if (_interface == nullptr) {
-        warn("_interface not allocated");
-        return false;
-    }
-
-    if (!_interface->init()) {
-        warn("bus interface not initialized");
-        return false;
     }
 
     _initialized = true;
