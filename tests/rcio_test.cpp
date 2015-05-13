@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <drivers/NavioRCIO.h>
+#include <drivers/common.h>
 #include <drivers/NavioRCInput.h>
 
 class NavioRCIO_Test : public ::testing::Test {
@@ -8,6 +9,7 @@ protected:
 
 	NavioRCIO_Test()
     {
+        common_init();
         auto interface = new NavioRCIO_serial{};
         interface->init();
         

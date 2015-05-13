@@ -5,6 +5,7 @@
 
 #include <drivers/NavioRCIO.h>
 #include <drivers/NavioRCInput.h>
+#include <drivers/common.h>
 
 #define debug(fmt, args ...) fprintf(stderr, "[RCIO]: " fmt "\n", ##args)
 #define log(fmt, args ...) debug(fmt, ##args)
@@ -30,6 +31,45 @@ bool NavioRCIO::init()
     if (_initialized) {
         return true;
     }
+
+    unsigned protocol;
+    uint32_t start_try_time = micros64();
+
+    do {
+        usleep(2000);
+        protocol = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_PROTOCOL_VERSION);
+    } while (protocol == _io_reg_get_error && (get_elapsed_time(&start_try_time) < 700U * 1000U));
+
+    /* if the error still persists after timing out, we give up */
+    if (protocol == _io_reg_get_error) {
+        log("Failed to communicate with IO, abort.");
+        return false;
+    }
+
+    if (protocol != PX4IO_PROTOCOL_VERSION) {
+        log("IO protocol/firmware mismatch, abort.");
+        return false;
+    }
+
+    _hardware      = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_HARDWARE_VERSION);
+    _max_actuators = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_ACTUATOR_COUNT);
+    _max_controls  = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_CONTROL_COUNT);
+    _max_relays    = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_RELAY_COUNT);
+    _max_transfer  = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_MAX_TRANSFER) - 2;
+    _max_rc_input  = io_reg_get(PX4IO_PAGE_CONFIG, PX4IO_P_CONFIG_RC_INPUT_COUNT);
+
+    if ((_max_actuators < 1) || (_max_actuators > 255) ||
+        (_max_relays > 32)   ||
+        (_max_transfer < 16) || (_max_transfer > 255)  ||
+        (_max_rc_input < 1)  || (_max_rc_input > 255)) {
+
+        log("config read error");
+        log("[IO] config read fail, abort.");
+        return false;
+    }
+
+    if (_max_rc_input > RC_INPUT_MAX_CHANNELS)
+        _max_rc_input = RC_INPUT_MAX_CHANNELS;
 
     _initialized = true;
 
@@ -354,53 +394,53 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
         ret = io_reg_set(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG, arg);
         break;
 
-    	case PX4IO_GET_DEBUG:
-		    *(unsigned long*)arg = io_reg_get(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG);
+        case PX4IO_GET_DEBUG:
+            *(unsigned long*)arg = io_reg_get(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_SET_DEBUG);
             ret = OK;
-		break;
+        break;
 
-    	case PX4IO_GET_RAW_ADC1:
-		    *(unsigned*)arg = io_reg_get(PX4IO_PAGE_RAW_ADC_INPUT, 0);
+        case PX4IO_GET_RAW_ADC1:
+            *(unsigned*)arg = io_reg_get(PX4IO_PAGE_RAW_ADC_INPUT, 0);
             ret = OK;
-		break;
+        break;
 
 
         case RC_INPUT_GET: {
-			uint16_t status;
-			rc_input_values *rc_val = (rc_input_values *)arg;
+            uint16_t status;
+            rc_input_values *rc_val = (rc_input_values *)arg;
 
-			ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS, &status, 1);
+            ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS, &status, 1);
 
-			if (ret != OK)
-				break;
+            if (ret != OK)
+                break;
 
-			/* if no R/C input, don't try to fetch anything */
-			if (!(status & PX4IO_P_STATUS_FLAGS_RC_OK)) {
-				ret = -ENOTCONN;
-				break;
-			}
+            /* if no R/C input, don't try to fetch anything */
+            if (!(status & PX4IO_P_STATUS_FLAGS_RC_OK)) {
+                ret = -ENOTCONN;
+                break;
+            }
 
-			/* sort out the source of the values */
-			if (status & PX4IO_P_STATUS_FLAGS_RC_PPM) {
-				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_PPM;
+            /* sort out the source of the values */
+            if (status & PX4IO_P_STATUS_FLAGS_RC_PPM) {
+                rc_val->input_source = RC_INPUT_SOURCE_PX4IO_PPM;
 
-			} else if (status & PX4IO_P_STATUS_FLAGS_RC_DSM) {
-				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SPEKTRUM;
+            } else if (status & PX4IO_P_STATUS_FLAGS_RC_DSM) {
+                rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SPEKTRUM;
 
-			} else if (status & PX4IO_P_STATUS_FLAGS_RC_SBUS) {
-				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SBUS;
+            } else if (status & PX4IO_P_STATUS_FLAGS_RC_SBUS) {
+                rc_val->input_source = RC_INPUT_SOURCE_PX4IO_SBUS;
 
-			} else if (status & PX4IO_P_STATUS_FLAGS_RC_ST24) {
-				rc_val->input_source = RC_INPUT_SOURCE_PX4IO_ST24;
+            } else if (status & PX4IO_P_STATUS_FLAGS_RC_ST24) {
+                rc_val->input_source = RC_INPUT_SOURCE_PX4IO_ST24;
 
-			} else {
-				rc_val->input_source = RC_INPUT_SOURCE_UNKNOWN;
-			}
+            } else {
+                rc_val->input_source = RC_INPUT_SOURCE_UNKNOWN;
+            }
 
-			/* read raw R/C input values */
-			ret = io_reg_get(PX4IO_PAGE_RAW_RC_INPUT, PX4IO_P_RAW_RC_BASE, &(rc_val->values[0]), _max_rc_input);
-			break;
-		}
+            /* read raw R/C input values */
+            ret = io_reg_get(PX4IO_PAGE_RAW_RC_INPUT, PX4IO_P_RAW_RC_BASE, &(rc_val->values[0]), _max_rc_input);
+            break;
+        }
 
         default:
         ret = -EINVAL;
