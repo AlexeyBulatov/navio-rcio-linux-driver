@@ -497,8 +497,19 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             *(bool *) arg = ret & PX4IO_P_STATUS_FLAGS_INIT_OK;
 
         }
-            default:
-        ret = -EINVAL;
+
+
+        case PWM_SERVO_ARM:
+            /* set the 'armed' bit */
+            ret = io_reg_modify(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_ARMING, 0, PX4IO_P_SETUP_ARMING_FMU_ARMED);
+            break;
+
+        case PWM_SERVO_SET_ARM_OK:
+            /* set the 'OK to arm' bit */
+            ret = io_reg_modify(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_ARMING, 0, PX4IO_P_SETUP_ARMING_IO_ARM_OK);
+            break;
+                default:
+            ret = -EINVAL;
     }
 
     return ret;
