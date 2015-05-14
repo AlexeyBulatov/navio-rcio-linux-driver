@@ -510,6 +510,24 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             break;
                 default:
             ret = -EINVAL;
+
+
+        case PWM_SERVO_SET(0) ... PWM_SERVO_SET(PWM_OUTPUT_MAX_CHANNELS - 1): {
+
+            /* TODO: we could go lower for e.g. TurboPWM */
+            unsigned channel = cmd - PWM_SERVO_SET(0);
+
+            if ((channel >= _max_actuators) || (arg < PWM_LOWEST_MIN) || (arg > PWM_HIGHEST_MAX)) {
+                ret = -EINVAL;
+
+            } else {
+                /* send a direct PWM value */
+                ret = io_reg_set(PX4IO_PAGE_DIRECT_PWM, channel, arg);
+            }
+
+            break;
+        }
+
     }
 
     return ret;
