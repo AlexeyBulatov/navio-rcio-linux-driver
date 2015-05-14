@@ -511,6 +511,15 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
                 default:
             ret = -EINVAL;
 
+        case PWM_SERVO_SET_FORCE_SAFETY_OFF:
+            /* force safety swith off */
+            ret = io_reg_set(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_FORCE_SAFETY_OFF, PX4IO_FORCE_SAFETY_MAGIC);
+            break;
+
+        case PWM_SERVO_SET_FORCE_SAFETY_ON:
+            /* force safety switch on */
+            ret = io_reg_set(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_FORCE_SAFETY_ON, PX4IO_FORCE_SAFETY_MAGIC);
+            break;
 
         case PWM_SERVO_SET(0) ... PWM_SERVO_SET(PWM_OUTPUT_MAX_CHANNELS - 1): {
 
