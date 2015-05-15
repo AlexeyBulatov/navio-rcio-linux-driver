@@ -167,9 +167,17 @@ TEST_F(NavioRCIO_Test, rc_output_pwm1) {
 
     int ret;
 
-    ret = -1;
+    servo_position_t pulse = 1700;
 
+    ret = rcio->ioctl(PWM_SERVO_SET(1), (unsigned long) pulse);
+   
     EXPECT_TRUE(ret >= 0);
+
+    ret = rcio->ioctl(PWM_SERVO_GET(1), (unsigned long) &pulse);
+   
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_EQ(pulse, 1700);
 }
 
 TEST_F(NavioRCIO_Test, rc_set_wrong_config) {

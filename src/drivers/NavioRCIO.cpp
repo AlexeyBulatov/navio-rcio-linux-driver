@@ -535,6 +535,28 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             break;
         }
 
+        case PWM_SERVO_GET(0) ... PWM_SERVO_GET(PWM_OUTPUT_MAX_CHANNELS - 1): {
+
+            unsigned channel = cmd - PWM_SERVO_GET(0);
+
+            if (channel >= _max_actuators) {
+                ret = -EINVAL;
+
+            } else {
+                /* fetch a current PWM value */
+                uint32_t value = io_reg_get(PX4IO_PAGE_SERVOS, channel);
+
+                if (value == _io_reg_get_error) {
+                    ret = -EIO;
+
+                } else {
+                    *(servo_position_t *)arg = value;
+                }
+            }
+
+            break;
+        }
+
         case IO_GET_OUTPUTS_ARM_STATUS:
             ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS);
             *(bool*)arg = (ret & PX4IO_P_STATUS_FLAGS_OUTPUTS_ARMED) ? true: false;
