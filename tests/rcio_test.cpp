@@ -115,25 +115,12 @@ TEST_F(NavioRCIO_Test, rc_input_source_st24_get) {
     EXPECT_FALSE(input_rc.input_source == RC_INPUT_SOURCE_PX4IO_ST24);
 }
 
-
-TEST_F(NavioRCIO_Test, rc_pwm_set_arm) {
+TEST_F(NavioRCIO_Test, rc_pwm_servo_outputs_arm_failsafe_off) {
     int ret;
 
-    ret = -1;
+    ret = rcio->ioctl(PWM_SERVO_SET_FORCE_SAFETY_OFF, 0);
 
     EXPECT_TRUE(ret >= 0);
-}
-
-TEST_F(NavioRCIO_Test, rc_pwm_set_disarm) {
-    int ret;
-
-    ret = -1;
-
-    EXPECT_TRUE(ret >= 0);
-}
-
-TEST_F(NavioRCIO_Test, rc_pwm_servo_arm) {
-    int ret;
 
     ret = rcio->ioctl(PWM_SERVO_SET_ARM_OK, 0);
 
@@ -142,14 +129,38 @@ TEST_F(NavioRCIO_Test, rc_pwm_servo_arm) {
     ret = rcio->ioctl(PWM_SERVO_ARM, 0);
 
     EXPECT_TRUE(ret >= 0);
-}
 
-TEST_F(NavioRCIO_Test, rc_pwm_clear_arm_ok) {
-    int ret;
+    bool armed;
 
-    ret = -1;
+    ret = rcio->ioctl(IO_GET_OUTPUTS_ARM_STATUS,(unsigned long) &armed);
 
     EXPECT_TRUE(ret >= 0);
+
+    EXPECT_TRUE(armed);
+}
+
+TEST_F(NavioRCIO_Test, rc_pwm_servo_outputs_arm_failsafe_on) {
+    int ret;
+
+    ret = rcio->ioctl(PWM_SERVO_SET_FORCE_SAFETY_ON, 0);
+
+    EXPECT_TRUE(ret >= 0);
+
+    ret = rcio->ioctl(PWM_SERVO_SET_ARM_OK, 0);
+
+    EXPECT_TRUE(ret >= 0);
+
+    ret = rcio->ioctl(PWM_SERVO_ARM, 0);
+
+    EXPECT_TRUE(ret >= 0);
+
+    bool armed;
+
+    ret = rcio->ioctl(IO_GET_OUTPUTS_ARM_STATUS, (unsigned long) &armed);
+
+    EXPECT_TRUE(ret >= 0);
+
+    EXPECT_FALSE(armed);
 }
 
 TEST_F(NavioRCIO_Test, rc_output_pwm1) {

@@ -57,9 +57,9 @@ int main(int argc, char *argv[])
             fprintf(stderr, "init failed\n");
         }
 
+        io.ioctl(PWM_SERVO_SET_FORCE_SAFETY_OFF, 0);
         io.ioctl(PWM_SERVO_SET_ARM_OK, 0);
         io.ioctl(PWM_SERVO_ARM, 0);
-        io.ioctl(PWM_SERVO_SET_FORCE_SAFETY_OFF, 0);
 
         while(true) {
             int ret;

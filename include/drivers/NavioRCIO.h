@@ -7,6 +7,7 @@
 #define PX4IO_GET_DEBUG 2
 #define PX4IO_GET_RAW_ADC1 3
 #define IO_GET_INIT_STATUS 5
+#define IO_GET_OUTPUTS_ARM_STATUS 6
 
 class NavioRCIO
 {

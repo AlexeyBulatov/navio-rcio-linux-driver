@@ -508,8 +508,6 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
             /* set the 'OK to arm' bit */
             ret = io_reg_modify(PX4IO_PAGE_SETUP, PX4IO_P_SETUP_ARMING, 0, PX4IO_P_SETUP_ARMING_IO_ARM_OK);
             break;
-                default:
-            ret = -EINVAL;
 
         case PWM_SERVO_SET_FORCE_SAFETY_OFF:
             /* force safety swith off */
@@ -536,6 +534,15 @@ int NavioRCIO::ioctl(int cmd, unsigned long arg)
 
             break;
         }
+
+        case IO_GET_OUTPUTS_ARM_STATUS:
+            ret = io_reg_get(PX4IO_PAGE_STATUS, PX4IO_P_STATUS_FLAGS);
+            *(bool*)arg = (ret & PX4IO_P_STATUS_FLAGS_OUTPUTS_ARMED) ? true: false;
+
+          break;
+
+        default:
+            ret = -EINVAL;
 
     }
 
