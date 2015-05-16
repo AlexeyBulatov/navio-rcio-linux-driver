@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     NavioRCIO_serial interface{};
 
     if (!interface.init()) {
-        fprintf(stderr, "bus interface not initialized");
+        fprintf(stderr, "bus interface not initialized\n");
         return 1;
     }
 

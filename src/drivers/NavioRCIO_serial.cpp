@@ -13,6 +13,12 @@
 
 #define log(fmt, args ...) fprintf(stderr, "[RCIO_serial]: " fmt "\n", ##args)
 
+#ifdef __arm__
+    #define SERIAL_FILEPATH "/dev/ttyAMA0"
+#else
+    #define SERIAL_FILEPATH "/dev/ttyUSB0"
+#endif 
+
 static int rate_to_constant(int baudrate) {
 #define B(x) case x: return B##x
     switch(baudrate) {
@@ -100,10 +106,10 @@ NavioRCIO_serial::NavioRCIO_serial():
 
 bool NavioRCIO_serial::init()
 {
-    _fd = _serial_open("/dev/ttyUSB0", _baudrate);
+    _fd = _serial_open(SERIAL_FILEPATH, _baudrate);
 
     if (_fd < 0) {
-        warn("_serial_open");
+        warn("_serial_open %s", SERIAL_FILEPATH);
         return false;
     }
 
