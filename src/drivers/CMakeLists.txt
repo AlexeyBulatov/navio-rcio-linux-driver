@@ -7,3 +7,4 @@ set(libdrivers_src
 )
 
 add_library(libdrivers ${libdrivers_src})
+target_link_libraries(libdrivers rt)
