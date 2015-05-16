@@ -98,9 +98,6 @@ bool NavioRCIO::init()
 
 NavioRCIO::~NavioRCIO()
 {
-    if (_interface != nullptr) {
-        delete _interface;
-    }
 }
 
 void NavioRCIO::poll()
