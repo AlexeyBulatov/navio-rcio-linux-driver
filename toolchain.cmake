@@ -1,8 +1,8 @@
 set(CMAKE_SYSTEM_NAME Linux)
 
-set(CMAKE_C_COMPILER $ENV{RPI_ROOT}/arm-linux-gnueabihf-gcc)
-set(CMAKE_CXX_COMPILER $ENV{RPI_ROOT}/arm-linux-gnueabihf-g++)
-set(CMAKE_CXX_LINKER $ENV{RPI_ROOT}/arm-linux-gnueabihf-ld)
+set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
+set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
+set(CMAKE_CXX_LINKER arm-linux-gnueabihf-ld)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
