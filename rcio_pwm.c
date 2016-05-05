@@ -57,6 +57,7 @@ static u16 default_frequency = 50;
 static bool default_frequency_updated = false;
 
 static bool armed = false;
+unsigned long armtimeout;
 
 bool rcio_pwm_update(struct rcio_state *state)
 {
@@ -184,6 +185,8 @@ static int rcio_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm, int du
     u16 duty_ms = duty_ns / 1000;
 
     u16 new_frequency = 1000000000 / period_ns;
+
+    armtimeout = jiffies + HZ / 50;
 
     if (pwm->hwpwm < 7) {
         if (new_frequency != alt_frequency) {
