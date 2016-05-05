@@ -75,7 +75,7 @@ bool rcio_pwm_update(struct rcio_state *state)
         default_frequency_updated = false;
     }
 
-    if time_before(jiffies, armtimeout) {
+    if (time_before(jiffies, armtimeout) && armtimeout > 0) {
         armed = true;
     } else {
         armed = false;
