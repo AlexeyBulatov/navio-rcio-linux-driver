@@ -75,6 +75,12 @@ bool rcio_pwm_update(struct rcio_state *state)
         default_frequency_updated = false;
     }
 
+    if time_before(jiffies, armtimeout) {
+        armed = true;
+    } else {
+        armed = false;
+    }
+
     if (armed) {
         return state->register_set(state, PX4IO_PAGE_DIRECT_PWM, 0, values, RCIO_PWM_MAX_CHANNELS);
     }
